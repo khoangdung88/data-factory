@@ -16,9 +16,10 @@ Reference for developers and AI agents extending data-factory. Overview and diag
 | `process/` | Raw → staged zone | `Reader`, `Processor`, `READERS`, `PROCESSORS`, `validate`, `run_process` |
 | `publish/` | Staged → product + targets | `Publisher`, `PUBLISHERS`, `build_package`, `run_publish` |
 | `pipeline/runner.py` | Load dataset, pick batch, run stages | `run`, `Stage`, `load_dataset`, `latest_batch` |
-| `cli.py` | Typer adapter, no logic | `datafactory run`, `datafactory version` |
+| `cli.py` | Typer adapter, no logic | `datafactory run`, `datafactory ui`, `datafactory version` |
+| `ui/` | Local web UI: pages over `pipeline.run` and zone files | `create_app`, `JobManager`, `catalog` |
 
-Import direction `cli → pipeline → collect | process | publish → contracts → core` and plugin
+Import direction `cli → ui → pipeline → collect | process | publish → contracts → core` and plugin
 independence are enforced by `import-linter` (`pyproject.toml`).
 
 ## 2. Data flow and contracts
@@ -76,6 +77,7 @@ class MyParams(BaseModel):
     model_config = ConfigDict(extra="forbid")
     column: str
 
+
 class MyStep(Processor):
     name = "my_step"
     version = "1.0.0"
@@ -92,6 +94,7 @@ class MyStep(Processor):
 |---|---|---|
 | Unit tests per plugin | `tests/<stage>/` | Offline; fake HTTP by monkeypatching the connector's `http_get` |
 | Golden test | `tests/test_golden_datasets.py` | Auto-runs every `datasets/*/`: copies `fixtures/input/` (raw batch incl. `_manifest.json`) into a temp raw zone, runs process + publish with a fixed clock, compares with `fixtures/expected/` byte for byte |
+| UI tests | `tests/ui/` | FastAPI `TestClient` against `sample-csv` in a temp data dir; wait on `Job.done` |
 | Live tests | `@pytest.mark.integration` | Skipped by `make check`/CI; run with `uv run pytest -m integration` |
 
 Golden fixtures must be synthetic or license-cleared and small. Create them by running the real pipeline
@@ -109,4 +112,5 @@ repo rules: Conventional Commit PR title, `feat` PRs must change `docs/features/
 
 - [ADR 0001](adr/0001-stack-and-architecture.md) — stack and stage/plugin architecture.
 - [ADR 0002](adr/0002-dataset-readers.md) — raw-to-table readers per dataset.
+- [ADR 0003](adr/0003-web-ui.md) — server-rendered web UI.
 - Feature specs: [`features/`](features/).

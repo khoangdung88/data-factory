@@ -5,6 +5,7 @@ from typing import Annotated
 
 import typer
 
+from datafactory.core.config import get_settings
 from datafactory.core.errors import DataFactoryError
 from datafactory.core.logging import configure_logging
 from datafactory.pipeline.runner import Stage, run
@@ -42,3 +43,20 @@ def run_dataset(
         typer.echo(f"package: {result.package_dir}")
     for dest in result.destinations:
         typer.echo(f"published: {dest}")
+
+
+@app.command("ui")
+def serve_ui(
+    host: Annotated[
+        str, typer.Option(help="Bind address (keep 127.0.0.1 unless trusted)")
+    ] = "127.0.0.1",
+    port: Annotated[int, typer.Option(help="Port")] = 8000,
+) -> None:
+    """Start the local web UI."""
+    import uvicorn  # noqa: PLC0415
+
+    from datafactory.ui.app import create_app  # noqa: PLC0415
+
+    configure_logging()
+    typer.echo(f"data-factory UI on http://{host}:{port}")
+    uvicorn.run(create_app(get_settings()), host=host, port=port)

@@ -53,7 +53,25 @@ Cấu hình (biến môi trường hoặc file `.env` ở thư mục gốc repo)
 | `DF_DATA_DIR` | `data` | Thư mục gốc của các vùng dữ liệu |
 | `DF_DATASETS_DIR` | `datasets` | Nơi chứa định nghĩa các dataset |
 
-## 4. Kết quả nhận được
+## 4. Giao diện web
+
+```bash
+uv run datafactory ui            # mở http://127.0.0.1:8000
+uv run datafactory ui --port 9000
+```
+
+| Trang | Việc có thể làm |
+|---|---|
+| **Datasets** (`/`) | Xem mọi dataset với version, batch mới nhất và gói mới nhất; `dataset.yaml` bị lỗi sẽ hiện thông báo lỗi |
+| **Dataset** | Chạy pipeline (cả quy trình hoặc một bước, chọn batch, tick *release*); xem danh sách gói (tải zip), batch và schema |
+| **Run** | Trạng thái, log và kết quả của một lần chạy; trang tự làm mới mỗi 2 giây đến khi xong. Mỗi dataset chỉ chạy một lần tại một thời điểm |
+| **Batch** | File thô kèm checksum, số liệu chất lượng, 50 dòng hợp lệ và 50 dòng bị loại đầu tiên |
+| **Product** | License, nguồn, lineage, chất lượng, danh sách file, xem trước dữ liệu, nút *Download zip* |
+
+UI không có đăng nhập và chỉ lắng nghe trên `127.0.0.1`: không mở ra internet. Lịch sử chạy chỉ giữ trong
+bộ nhớ và mất khi tắt UI; dữ liệu trong các vùng `data/` không bị ảnh hưởng.
+
+## 5. Kết quả nhận được
 
 ```text
 data/
@@ -75,7 +93,7 @@ Thư mục gói sản phẩm là thứ anh tải lên hoặc bán:
 Kiểm tra chất lượng trước khi bán: mục `quality` trong `datapackage.json` (`rows_in`, `rows_valid`,
 `rows_invalid`, `null_counts`) và các dòng trong `staged/<slug>/<batch_id>/quarantine.csv`.
 
-## 5. Các hành vi có thể tin cậy
+## 6. Các hành vi có thể tin cậy
 
 - **Chạy lại an toàn.** Dữ liệu nguồn không đổi → cùng `batch_id`, không tạo bản trùng. Cùng dữ liệu và
   cùng version → dùng lại gói đã có.
@@ -86,7 +104,7 @@ Kiểm tra chất lượng trước khi bán: mục `quality` trong `datapackage
   `valid rows < min_rows` hoặc `invalid ratio ... > max`, không gói nào được xuất bản.
 - `data/` không được đưa lên Git: gói sản phẩm nằm trên máy anh cho tới khi một publisher gửi đi.
 
-## 6. Tạo dataset của riêng anh
+## 7. Tạo dataset của riêng anh
 
 1. Tạo thư mục `datasets/<slug>/` (`<slug>` gồm các từ viết thường nối bằng `-`).
 2. `dataset.yaml`:
@@ -144,7 +162,7 @@ rỗng là null. Cột `required` bị null hoặc sai kiểu thì dòng đó b�
 | processor | `sort_rows` | `by` |
 | publisher | `local_folder` | `target_dir` (mặc định `exports`, tương đối so với `DF_DATA_DIR`) |
 
-## 7. Xử lý lỗi
+## 8. Xử lý lỗi
 
 | Thông báo | Nguyên nhân → cách xử lý |
 |---|---|

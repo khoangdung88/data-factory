@@ -1,0 +1,7 @@
+{% if preview %}
+<div class="scroll"><table>
+  <tr>{% for c in preview.columns %}<th>{{ c }}</th>{% endfor %}</tr>
+  {% for row in preview.rows %}<tr>{% for v in row %}<td>{{ v }}</td>{% endfor %}</tr>{% endfor %}
+</table></div>
+<p class="muted">{% if preview.truncated %}First {{ preview.rows | length }} rows shown.{% else %}{{ preview.rows | length }} rows.{% endif %}</p>
+{% else %}<p class="muted">Not available.</p>{% endif %}

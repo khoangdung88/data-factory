@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Datasets{% endblock %}
+{% block content %}
+<h1>Datasets</h1>
+<p class="muted">Definitions in <code>datasets/</code>. Open a dataset to run it.</p>
+<table>
+  <tr><th>Dataset</th><th>Title</th><th>Version</th><th>Connector</th><th>Latest batch</th><th>Latest product</th></tr>
+  {% for entry, batch, product in rows %}
+  <tr>
+    <td><a href="/datasets/{{ entry.slug }}">{{ entry.slug }}</a></td>
+    {% if entry.spec %}
+    <td>{{ entry.spec.title }}</td>
+    <td>{{ entry.spec.version }}</td>
+    <td>{{ entry.spec.source.plugin }}</td>
+    <td>{% if batch %}<a href="/datasets/{{ entry.slug }}/batches/{{ batch.raw.batch_id }}">{{ batch.raw.batch_id }}</a>
+        <span class="muted">{{ batch.raw.fetched_at.strftime("%Y-%m-%d") }}</span>{% else %}<span class="muted">—</span>{% endif %}</td>
+    <td>{% if product %}<a href="/datasets/{{ entry.slug }}/products/{{ product.version }}">{{ product.version }}</a>
+        <span class="muted">{{ product.quality.rows_valid }} rows</span>{% else %}<span class="muted">—</span>{% endif %}</td>
+    {% else %}
+    <td colspan="5" class="bad">{{ entry.error }}</td>
+    {% endif %}
+  </tr>
+  {% else %}
+  <tr><td colspan="6" class="muted">No datasets found.</td></tr>
+  {% endfor %}
+</table>
+<h2>Recent runs</h2>
+{% include "_jobs.html" %}
+{% endblock %}

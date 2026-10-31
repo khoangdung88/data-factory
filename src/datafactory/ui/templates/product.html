@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ package.name }} {{ package.version }}{% endblock %}
+{% block content %}
+<h1>{{ package.title }} <span class="muted">{{ package.version }}</span></h1>
+<p class="muted"><a href="/datasets/{{ slug }}">{{ slug }}</a> · created {{ package.created.strftime("%Y-%m-%d %H:%M:%S") }} UTC</p>
+<p><a class="btn" href="/datasets/{{ slug }}/products/{{ package.version }}/download">Download zip</a></p>
+<p>{{ package.description }}</p>
+
+<h2>Quality</h2>
+{% with quality = package.quality %}{% include "_quality.html" %}{% endwith %}
+
+<h2>License, sources and lineage</h2>
+<table>
+  <tr><th>License</th><td>{% for l in package.licenses %}<a href="{{ l.path }}">{{ l.name }}</a> {% endfor %}</td></tr>
+  <tr><th>Sources</th><td>{% for s in package.sources %}{% if s.title != s.path %}{{ s.title }}: {% endif %}<code>{{ s.path }}</code><br>{% endfor %}</td></tr>
+  <tr><th>Batches</th><td>{% for b in package.lineage.batch_ids %}<a href="/datasets/{{ slug }}/batches/{{ b }}">{{ b }}</a> {% endfor %}</td></tr>
+  <tr><th>Connector</th><td><code>{{ package.lineage.connector.name }} {{ package.lineage.connector.version }}</code></td></tr>
+  <tr><th>Processors</th><td>{% for p in package.lineage.processors %}<code>{{ p.name }} {{ p.version }}</code> {% else %}none{% endfor %}</td></tr>
+</table>
+
+<h2>Files</h2>
+<table>
+  <tr><th>File</th></tr>
+  {% for f in files %}<tr><td>{{ f }}</td></tr>{% endfor %}
+</table>
+{% for r in package.resources %}
+<p class="muted"><code>{{ r.path }}</code>: {{ r.bytes }} bytes · {{ r.hash }}</p>
+{% endfor %}
+
+<h2>Data preview</h2>
+{% with preview = data %}{% include "_preview.html" %}{% endwith %}
+{% endblock %}

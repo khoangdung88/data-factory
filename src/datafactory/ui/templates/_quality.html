@@ -1,0 +1,10 @@
+<div class="grid">
+  <div class="card stat"><span class="muted">Rows in</span><b>{{ quality.rows_in }}</b></div>
+  <div class="card stat"><span class="muted">Valid</span><b class="ok">{{ quality.rows_valid }}</b></div>
+  <div class="card stat"><span class="muted">Rejected</span><b class="{{ 'bad' if quality.rows_invalid else '' }}">{{ quality.rows_invalid }}</b></div>
+  <div class="card stat"><span class="muted">Rejected ratio</span><b>{{ "%.2f" | format(quality.invalid_ratio * 100) }}%</b></div>
+</div>
+{% if quality.null_counts %}
+<p class="muted">Empty values per column:
+{% for k, v in quality.null_counts.items() %}<code>{{ k }}</code> {{ v }}{% if not loop.last %} · {% endif %}{% endfor %}</p>
+{% endif %}

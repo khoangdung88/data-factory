@@ -39,11 +39,12 @@ Unit of work = a **dataset** declared in `datasets/<slug>/dataset.yaml`.
 | `src/datafactory/publish/` | `Publisher` interface + `publishers/<name>.py` plugins + registry |
 | `src/datafactory/pipeline/` | orchestration: reads `dataset.yaml`, runs stages, records lineage |
 | `src/datafactory/cli.py` | Typer CLI (thin, no logic) |
+| `src/datafactory/ui/` | local web UI (FastAPI + Jinja2); calls `pipeline`, reads zones via `contracts` |
 | `datasets/<slug>/` | `dataset.yaml`, `schema/vN.json`, `README.md` (datasheet), `fixtures/` |
 | `docs/` | `architecture.md`, `features/` specs, `adr/` decisions |
 | `data/` | local data zones `raw/ staged/ products/` — git-ignored |
 
-Import direction (enforced): `cli → pipeline → collect | process | publish → contracts → core`.
+Import direction (enforced): `cli → ui → pipeline → collect | process | publish → contracts → core`.
 
 ## Workflow (every task)
 

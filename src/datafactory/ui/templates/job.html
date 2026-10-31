@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Run {{ job.id }}{% endblock %}
+{% block content %}
+<h1>Run {{ job.id }} <span class="badge {{ job.status }}">{{ job.status }}</span></h1>
+<p class="muted"><a href="/datasets/{{ job.slug }}">{{ job.slug }}</a> · stage {{ job.stage or "all" }}
+  {% if job.batch_id %}· batch {{ job.batch_id }}{% endif %}{% if job.release %} · release{% endif %}
+  · started {{ job.started_at.strftime("%Y-%m-%d %H:%M:%S") }} UTC
+  {% if job.finished_at %}· took {{ (job.finished_at - job.started_at).total_seconds() | int }} s{% endif %}</p>
+{% if running %}<p class="running">Running… this page refreshes every 2 seconds.</p>{% endif %}
+{% if job.error %}<p class="error">{{ job.error }}</p>{% endif %}
+{% if job.result %}
+<div class="card">
+  <p>Batch: <a href="/datasets/{{ job.slug }}/batches/{{ job.result.batch_id }}">{{ job.result.batch_id }}</a></p>
+  {% if job.result.package_dir %}
+  <p>Package: <a href="/datasets/{{ job.slug }}/products/{{ job.result.package_dir.name }}">{{ job.result.package_dir }}</a></p>
+  {% endif %}
+  {% for d in job.result.destinations %}<p>Published: <code>{{ d }}</code></p>{% endfor %}
+</div>
+{% endif %}
+<h2>Log</h2>
+<pre>{% for line in job.logs %}{{ line }}
+{% else %}(no log lines){% endfor %}</pre>
+{% endblock %}
