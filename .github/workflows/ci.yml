@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  check:
+    name: check (lint, types, imports, tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with: { enable-cache: true }
+      - run: uv sync --locked
+      - run: uv run ruff check . --output-format=github
+      - run: uv run ruff format --check .
+      - run: uv run mypy
+      - run: uv run lint-imports
+      - run: uv run pytest -m "not integration"
+
+  rules:
+    name: repo rules
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: PR title is a Conventional Commit
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          re='^(feat|fix|refactor|perf|test|docs|chore|ci|build)(\([a-z0-9-]+\))?!?: .+'
+          if ! [[ "$TITLE" =~ $re ]]; then
+            echo "::error::PR title must look like 'feat(collect): add X' (see AGENTS.md)"; exit 1; fi
+      - name: Released schemas are immutable
+        run: |
+          changed=$(git diff --name-status --diff-filter=MDR "origin/${{ github.base_ref }}...HEAD" \
+            -- 'datasets/*/schema/*.json' || true)
+          if [ -n "$changed" ]; then
+            echo "$changed"
+            echo "::error::Released schema edited/removed. Add schema/vN+1.json instead (AGENTS.md rule 3)"
+            exit 1
+          fi
+      - name: feat PRs need a spec or ADR
+        if: startsWith(github.event.pull_request.title, 'feat')
+        run: |
+          if ! git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -qE '^docs/(features|adr)/'; then
+            echo "::error::feat PR without docs/features or docs/adr change (AGENTS.md rule 5)"; exit 1
+          fi

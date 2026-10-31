@@ -1,0 +1,21 @@
+name: Data source / data product
+description: Propose a new source to collect or a new dataset to sell
+labels: [dataset]
+body:
+  - type: input
+    id: source
+    attributes: { label: Source, description: URL / API / provider }
+    validations: { required: true }
+  - type: textarea
+    id: license
+    attributes:
+      label: License & terms
+      description: Link to license/ToS. Does it allow commercial use and resale? Any PII?
+    validations: { required: true }
+  - type: textarea
+    id: product
+    attributes: { label: Target product, description: Fields, granularity, update frequency, buyers. }
+    validations: { required: true }
+  - type: input
+    id: access
+    attributes: { label: Access method, description: "API / bulk file / crawl; auth needed?" }

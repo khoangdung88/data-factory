@@ -1,0 +1,18 @@
+name: Feature
+description: New capability or behavior change
+labels: [feature]
+body:
+  - type: textarea
+    id: problem
+    attributes: { label: Problem, description: What is missing and for whom? }
+    validations: { required: true }
+  - type: textarea
+    id: proposal
+    attributes: { label: Proposal, description: Expected behavior / acceptance criteria. }
+    validations: { required: true }
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [collect, process, publish, pipeline, contracts, cli, datasets, docs/agent-rules, other]
+    validations: { required: true }

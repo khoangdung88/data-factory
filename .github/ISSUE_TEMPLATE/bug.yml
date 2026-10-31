@@ -1,0 +1,12 @@
+name: Bug
+description: Something worked before and is now broken, or never worked as specified
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes: { label: What happened vs. expected }
+    validations: { required: true }
+  - type: textarea
+    id: repro
+    attributes: { label: Reproduce, description: "Command, dataset slug, version, logs." }
+    validations: { required: true }
