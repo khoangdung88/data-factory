@@ -1,0 +1,46 @@
+{
+  "dataset": "wb-macro-indicators",
+  "batch_id": "bc38a5882e2a",
+  "connector": "worldbank",
+  "connector_version": "1.0.0",
+  "source": "https://api.worldbank.org/v2/country/economies/indicator/NY.GDP.MKTP.CD;NY.GDP.PCAP.CD;NY.GDP.MKTP.KD.ZG;SP.POP.TOTL;FP.CPI.TOTL.ZG?date=2000:2025",
+  "license": "CC BY 4.0, World Bank Open Data terms (https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets); attribution \"The World Bank: World Development Indicators\" required.",
+  "fetched_at": "2026-01-01T00:00:00Z",
+  "files": [
+    {
+      "path": "countries.json",
+      "sha256": "cc0c0a9623d35d2743724691bb28bbe13b85292447808f2b34b35a023f00e3a7",
+      "bytes": 344
+    },
+    {
+      "path": "indicator-FP.CPI.TOTL.ZG-p001.json",
+      "sha256": "8e558099adbe63d1ca08ca3e836652ebe13fd769af0dd7c624252b53565b6b81",
+      "bytes": 1052
+    },
+    {
+      "path": "indicator-NY.GDP.MKTP.CD-p001.json",
+      "sha256": "20a64a19e923f0da8467344bda2c3c089d2c525cf29aadd6aa9039197b71eeab",
+      "bytes": 1002
+    },
+    {
+      "path": "indicator-NY.GDP.MKTP.KD.ZG-p001.json",
+      "sha256": "e1f8c12fc3b80eb407b03de8c324ccbc9071d5a0a41629ef59e4a962262b8ba2",
+      "bytes": 1002
+    },
+    {
+      "path": "indicator-NY.GDP.PCAP.CD-p001.json",
+      "sha256": "09720159f7d8b31a0e50c80bdcb4227227d50b9badd87aa972ebe0438811db22",
+      "bytes": 1030
+    },
+    {
+      "path": "indicator-SP.POP.TOTL-p001.json",
+      "sha256": "93addb4b518472a239ab205d4c821b45a98eb7a5975ddc1dee223d09f41553fc",
+      "bytes": 534
+    },
+    {
+      "path": "indicator-SP.POP.TOTL-p002.json",
+      "sha256": "3290fac4e89c542fd195e422696088720969dadcdce3b5e18124dec43426a60d",
+      "bytes": 532
+    }
+  ]
+}

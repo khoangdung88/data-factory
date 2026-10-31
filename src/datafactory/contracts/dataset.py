@@ -39,6 +39,7 @@ class DatasetSpec(_Strict):
     schema_version: int = Field(ge=1)
     license: License
     source: SourceSpec
+    reader: StepSpec = StepSpec(plugin="csv")
     processing: list[StepSpec] = Field(default_factory=list)
     quality: QualityGates = QualityGates()
     publish: list[StepSpec] = Field(default_factory=list)

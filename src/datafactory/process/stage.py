@@ -4,11 +4,11 @@ from datafactory.contracts.batch import BatchManifest
 from datafactory.contracts.dataset import DatasetSpec, TableSchema
 from datafactory.contracts.staged import PluginRef, StagedManifest
 from datafactory.core.config import Settings
-from datafactory.core.errors import BatchNotFoundError, ConfigError
+from datafactory.core.errors import BatchNotFoundError
 from datafactory.core.logging import get_logger
 from datafactory.core.storage import MANIFEST_FILE, Zone, batch_dir, write_text
-from datafactory.process.csvio import read_csv, write_csv
-from datafactory.process.registry import get_processor
+from datafactory.process.csvio import write_csv
+from datafactory.process.registry import get_processor, get_reader
 from datafactory.process.validate import validate
 
 log = get_logger(__name__)
@@ -21,11 +21,8 @@ def run_process(
     if not (raw / MANIFEST_FILE).is_file():
         raise BatchNotFoundError(f"raw batch {batch_id} not found for {spec.slug}")
     batch = BatchManifest.model_validate_json((raw / MANIFEST_FILE).read_text("utf-8"))
-    csv_files = [f.path for f in batch.files if f.path.endswith(".csv")]
-    if len(csv_files) != 1:
-        raise ConfigError(f"expected exactly one CSV in raw batch, found {csv_files}")
-
-    table = read_csv(raw / csv_files[0])
+    reader = get_reader(spec.reader.plugin)
+    table = reader.read(raw, sorted(f.path for f in batch.files), spec.reader.params)
     applied: list[PluginRef] = []
     for step in spec.processing:
         processor = get_processor(step.plugin)

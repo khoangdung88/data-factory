@@ -1,0 +1,19 @@
+country_code,country_name,indicator_code,indicator_name,year,value
+AAA,Alphaland,FP.CPI.TOTL.ZG,"Inflation, consumer prices (annual %)",2020,4.5
+AAA,Alphaland,FP.CPI.TOTL.ZG,"Inflation, consumer prices (annual %)",2021,2.25
+AAA,Alphaland,NY.GDP.MKTP.CD,GDP (current US$),2020,1100000000.5
+AAA,Alphaland,NY.GDP.MKTP.CD,GDP (current US$),2021,1000000000
+AAA,Alphaland,NY.GDP.MKTP.KD.ZG,GDP growth (annual %),2020,-0.42
+AAA,Alphaland,NY.GDP.MKTP.KD.ZG,GDP growth (annual %),2021,3.1
+AAA,Alphaland,NY.GDP.PCAP.CD,GDP per capita (current US$),2020,2650.75
+AAA,Alphaland,NY.GDP.PCAP.CD,GDP per capita (current US$),2021,2500.25
+AAA,Alphaland,SP.POP.TOTL,"Population, total",2021,400000
+BBB,Betaland,FP.CPI.TOTL.ZG,"Inflation, consumer prices (annual %)",2020,2.25
+BBB,Betaland,FP.CPI.TOTL.ZG,"Inflation, consumer prices (annual %)",2021,4.5
+BBB,Betaland,NY.GDP.MKTP.CD,GDP (current US$),2020,1000000000
+BBB,Betaland,NY.GDP.MKTP.CD,GDP (current US$),2021,1100000000.5
+BBB,Betaland,NY.GDP.MKTP.KD.ZG,GDP growth (annual %),2020,3.1
+BBB,Betaland,NY.GDP.MKTP.KD.ZG,GDP growth (annual %),2021,-0.42
+BBB,Betaland,NY.GDP.PCAP.CD,GDP per capita (current US$),2020,2500.25
+BBB,Betaland,NY.GDP.PCAP.CD,GDP per capita (current US$),2021,2650.75
+BBB,Betaland,SP.POP.TOTL,"Population, total",2020,400000

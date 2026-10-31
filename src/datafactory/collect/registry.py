@@ -2,10 +2,12 @@
 
 from datafactory.collect.base import Connector
 from datafactory.collect.connectors.local_file import LocalFileConnector
+from datafactory.collect.connectors.worldbank import WorldBankConnector
 from datafactory.core.errors import PluginNotFoundError
 
 CONNECTORS: dict[str, type[Connector]] = {
     LocalFileConnector.name: LocalFileConnector,
+    WorldBankConnector.name: WorldBankConnector,
 }
 
 

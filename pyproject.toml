@@ -72,5 +72,6 @@ type = "independence"
 modules = [
     "datafactory.collect.connectors.*",
     "datafactory.process.processors.*",
+    "datafactory.process.readers.*",
     "datafactory.publish.publishers.*",
 ]
