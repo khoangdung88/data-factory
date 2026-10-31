@@ -130,6 +130,34 @@ def test_running_job_is_never_evicted() -> None:
     assert manager.get(held.id) is not None
 
 
+def test_starts_do_not_hang_when_all_slots_busy() -> None:
+    release_all = threading.Event()
+
+    def held_run(slug: str, *a: object) -> RunResult:
+        release_all.wait(5)
+        return RunResult(batch_id=slug)
+
+    manager = JobManager(held_run, now=lambda: NOW)
+    jobs = [manager.start(f"ds-{i}", None, None, False) for i in range(110)]
+    release_all.set()
+    for job in jobs:
+        assert job.done.wait(10)
+    assert len(manager.list()) <= 110
+
+
+def test_list_is_newest_first() -> None:
+    def instant(slug: str, *a: object) -> RunResult:
+        return RunResult(batch_id=slug)
+
+    manager = JobManager(instant, now=lambda: NOW)
+    jobs = [manager.start(f"ds-{i}", None, None, False) for i in range(105)]
+    for job in jobs:
+        assert job.done.wait(5)
+    listed = manager.list()
+    assert listed[0].slug == jobs[-1].slug
+    assert [j.slug for j in listed] == [f"ds-{i}" for i in reversed(range(5, 105))]
+
+
 @pytest.mark.parametrize(
     "path",
     [
@@ -163,6 +191,17 @@ def test_unsafe_names_rejected(settings: Settings, name: str) -> None:
         catalog.get_batch("sample-csv", name, settings)
     with pytest.raises(catalog.NotFoundError):
         catalog.product_dir("sample-csv", name, settings)
+
+
+@pytest.mark.parametrize("path", ["tables/data.csv", "a/b/c.csv"])
+def test_safe_relpath_accepts_nested(path: str) -> None:
+    assert catalog.safe_relpath(path).as_posix() == path
+
+
+@pytest.mark.parametrize("path", ["../x", "/abs/f.csv", "a/../b", "..", "//srv/f"])
+def test_safe_relpath_rejects_traversal(path: str) -> None:
+    with pytest.raises(catalog.NotFoundError):
+        catalog.safe_relpath(path)
 
 
 def test_product_zip_stream_contents(tmp_path: Path) -> None:

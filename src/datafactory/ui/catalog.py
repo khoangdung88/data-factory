@@ -6,7 +6,7 @@ import tempfile
 import zipfile
 from collections.abc import Iterator
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from pydantic import ValidationError
 
@@ -58,6 +58,16 @@ def safe_name(name: str) -> str:
     if not _NAME.fullmatch(name) or ".." in name:
         raise NotFoundError(name)
     return name
+
+
+def safe_relpath(path: str) -> PurePosixPath:
+    """A relative path that cannot traverse outside the data zones."""
+    rel = PurePosixPath(path)
+    if rel.is_absolute() or not rel.parts:
+        raise NotFoundError(path)
+    for part in rel.parts:
+        safe_name(part)
+    return rel
 
 
 def _child(parent: Path, name: str) -> Path:

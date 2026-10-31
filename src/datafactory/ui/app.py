@@ -160,10 +160,12 @@ def product(request: Request, slug: str, version: str) -> HTMLResponse:
     except catalog.NotFoundError as exc:
         raise HTTPException(404, f"product {slug} {version} not found") from exc
     files = sorted(p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file())
-    try:
-        data = catalog.safe_name(package.resources[0].path) if package.resources else "data.csv"
-    except catalog.NotFoundError as exc:
-        raise HTTPException(404, f"unsafe resource path {package.resources[0].path!r}") from exc
+    data = "data.csv"
+    if package.resources:
+        try:
+            data = catalog.safe_relpath(package.resources[0].path).as_posix()
+        except catalog.NotFoundError as exc:
+            raise HTTPException(404, f"unsafe resource path {package.resources[0].path!r}") from exc
     return _page(
         request,
         "product.html",

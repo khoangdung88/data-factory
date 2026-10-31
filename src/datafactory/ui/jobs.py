@@ -94,14 +94,13 @@ class JobManager:
             if busy:
                 raise DatasetBusyError(busy.id)
             self._jobs[job.id] = job
-            # Drop oldest finished jobs first; a still-running job is moved to the end so it can
-            # never be evicted while its busy guard is needed.
-            while len(self._jobs) > MAX_JOBS:
-                key, evicted = next(iter(self._jobs.items()))
-                if evicted.done.is_set():
-                    self._jobs.popitem(last=False)
-                else:
-                    self._jobs.move_to_end(key)
+            # Evict finished jobs oldest-first to bound memory. Running jobs are never evicted:
+            # if every slot is busy the cap is exceeded rather than dropping a busy guard.
+            for key, old in list(self._jobs.items()):
+                if len(self._jobs) <= MAX_JOBS:
+                    break
+                if old.done.is_set():
+                    del self._jobs[key]
         threading.Thread(target=self._execute, args=(job,), daemon=True).start()
         return job
 
