@@ -31,7 +31,9 @@ def test_fetches_economies_and_all_pages(tmp_path: Path, monkeypatch: pytest.Mon
             return json.dumps(COUNTRIES).encode()
         return _page(int(url.rsplit("page=", 1)[1]), 2)
 
+    sleeps: list[float] = []
     monkeypatch.setattr(worldbank, "http_get", fake_get)
+    monkeypatch.setattr(worldbank.time, "sleep", sleeps.append)
     params = {"indicators": ["SP.POP.TOTL"], "date": "2020:2021"}
     source = WorldBankConnector().fetch(params, FetchContext(dest=tmp_path, dataset_dir=tmp_path))
 
@@ -43,7 +45,8 @@ def test_fetches_economies_and_all_pages(tmp_path: Path, monkeypatch: pytest.Mon
         "indicator-SP.POP.TOTL-p002.json",
     ]
     assert (tmp_path / "indicator-SP.POP.TOTL-p002.json").read_bytes() == _page(2, 2)
-    assert source.endswith("/country/economies/indicator/SP.POP.TOTL?date=2020:2021")
+    assert source.endswith("/country/AUS;VNM/indicator/SP.POP.TOTL?format=json&date=2020:2021")
+    assert sleeps == [worldbank.REQUEST_INTERVAL_S] * 2
 
 
 def test_api_error_message_raises(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

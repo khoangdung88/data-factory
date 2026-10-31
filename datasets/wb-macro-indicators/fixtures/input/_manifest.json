@@ -3,7 +3,7 @@
   "batch_id": "bc38a5882e2a",
   "connector": "worldbank",
   "connector_version": "1.0.0",
-  "source": "https://api.worldbank.org/v2/country/economies/indicator/NY.GDP.MKTP.CD;NY.GDP.PCAP.CD;NY.GDP.MKTP.KD.ZG;SP.POP.TOTL;FP.CPI.TOTL.ZG?date=2000:2025",
+  "source": "https://api.worldbank.org/v2/country/AAA;BBB/indicator/NY.GDP.MKTP.CD;NY.GDP.PCAP.CD;NY.GDP.MKTP.KD.ZG;SP.POP.TOTL;FP.CPI.TOTL.ZG?format=json&date=2000:2025",
   "license": "CC BY 4.0, World Bank Open Data terms (https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets); attribution \"The World Bank: World Development Indicators\" required.",
   "fetched_at": "2026-01-01T00:00:00Z",
   "files": [

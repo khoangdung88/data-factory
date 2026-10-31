@@ -12,8 +12,8 @@
   ],
   "sources": [
     {
-      "title": "worldbank: https://api.worldbank.org/v2/country/economies/indicator/NY.GDP.MKTP.CD;NY.GDP.PCAP.CD;NY.GDP.MKTP.KD.ZG;SP.POP.TOTL;FP.CPI.TOTL.ZG?date=2000:2025",
-      "path": "https://api.worldbank.org/v2/country/economies/indicator/NY.GDP.MKTP.CD;NY.GDP.PCAP.CD;NY.GDP.MKTP.KD.ZG;SP.POP.TOTL;FP.CPI.TOTL.ZG?date=2000:2025"
+      "title": "worldbank: https://api.worldbank.org/v2/country/AAA;BBB/indicator/NY.GDP.MKTP.CD;NY.GDP.PCAP.CD;NY.GDP.MKTP.KD.ZG;SP.POP.TOTL;FP.CPI.TOTL.ZG?format=json&date=2000:2025",
+      "path": "https://api.worldbank.org/v2/country/AAA;BBB/indicator/NY.GDP.MKTP.CD;NY.GDP.PCAP.CD;NY.GDP.MKTP.KD.ZG;SP.POP.TOTL;FP.CPI.TOTL.ZG?format=json&date=2000:2025"
     }
   ],
   "resources": [
