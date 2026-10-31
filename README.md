@@ -3,7 +3,7 @@
 Automated pipeline that **collects** data, **processes** it into clean validated tables and **publishes**
 it as packaged, licensed data products ready for data marketplaces.
 
-- User guide (install, run, create datasets): [`docs/user-guide.md`](docs/user-guide.md)
+- User guide (install, run, create datasets): [`docs/user-guide.md`](docs/user-guide.md) ([Tiếng Việt](docs/user-guide.vi.md))
 - Technical guide (internals, extending, testing): [`docs/technical-guide.md`](docs/technical-guide.md)
 - Architecture: [`docs/architecture.md`](docs/architecture.md)
 - Contributor & AI-agent rules: [`AGENTS.md`](AGENTS.md)
