@@ -12,7 +12,7 @@ from enum import StrEnum
 from datafactory.core.errors import DataFactoryError
 from datafactory.pipeline.runner import RunResult, Stage
 
-RunFn = Callable[[str, Stage | None, str | None, bool], RunResult]
+RunFn = Callable[[str, Stage | None, str | None, bool, datetime], RunResult]
 MAX_JOBS = 100
 
 
@@ -36,6 +36,7 @@ class Job:
     batch_id: str | None
     release: bool
     started_at: datetime
+    now: datetime
     status: JobStatus = JobStatus.RUNNING
     finished_at: datetime | None = None
     result: RunResult | None = None
@@ -56,46 +57,62 @@ class _ThreadLogHandler(logging.Handler):
             self.job.logs.append(self.format(record))
 
 
+def _utcnow() -> datetime:
+    return datetime.now(UTC).replace(microsecond=0)
+
+
 class JobManager:
-    def __init__(self, run_fn: RunFn) -> None:
+    """In-memory runs. ``now`` is injected for deterministic tests."""
+
+    def __init__(
+        self,
+        run_fn: RunFn,
+        *,
+        now: Callable[[], datetime] = _utcnow,
+        make_id: Callable[[], str] | None = None,
+    ) -> None:
         self._run_fn = run_fn
+        self._now = now
+        self._make_id = make_id or (lambda: uuid.uuid4().hex[:12])
         self._jobs: OrderedDict[str, Job] = OrderedDict()
         self._lock = threading.Lock()
 
     def start(self, slug: str, stage: Stage | None, batch_id: str | None, release: bool) -> Job:
+        job = Job(
+            id=self._make_id(),
+            slug=slug,
+            stage=stage,
+            batch_id=batch_id,
+            release=release,
+            started_at=self._now(),
+            now=self._now(),
+        )
         with self._lock:
             busy = next(
                 (j for j in self._jobs.values() if j.slug == slug and not j.done.is_set()), None
             )
             if busy:
                 raise DatasetBusyError(busy.id)
-            job = Job(
-                id=uuid.uuid4().hex[:12],
-                slug=slug,
-                stage=stage,
-                batch_id=batch_id,
-                release=release,
-                started_at=datetime.now(UTC).replace(microsecond=0),
-            )
             self._jobs[job.id] = job
-            while len(self._jobs) > MAX_JOBS:
-                self._jobs.popitem(last=False)
+            self._evict_finished()
         threading.Thread(target=self._execute, args=(job,), daemon=True).start()
         return job
 
     def get(self, job_id: str) -> Job | None:
-        return self._jobs.get(job_id)
+        with self._lock:
+            return self._jobs.get(job_id)
 
     def list(self, slug: str | None = None) -> list[Job]:
-        jobs = [j for j in reversed(self._jobs.values()) if slug is None or j.slug == slug]
-        return jobs
+        with self._lock:  # _execute evicts finished jobs; iterate a snapshot
+            snapshot = list(reversed(self._jobs.values()))
+        return [j for j in snapshot if slug is None or j.slug == slug]
 
     def _execute(self, job: Job) -> None:
         handler = _ThreadLogHandler(job, threading.get_ident())
         root = logging.getLogger()
         root.addHandler(handler)
         try:
-            job.result = self._run_fn(job.slug, job.stage, job.batch_id, job.release)
+            job.result = self._run_fn(job.slug, job.stage, job.batch_id, job.release, job.now)
             job.status = JobStatus.SUCCEEDED
         except DataFactoryError as exc:
             job.error = str(exc)
@@ -106,5 +123,16 @@ class JobManager:
             job.status = JobStatus.FAILED
         finally:
             root.removeHandler(handler)
-            job.finished_at = datetime.now(UTC).replace(microsecond=0)
+            job.finished_at = self._now()
             job.done.set()
+            with self._lock:
+                self._evict_finished()
+
+    def _evict_finished(self) -> None:
+        """Drop finished jobs oldest-first to bound memory. Running jobs are never evicted:
+        if every slot is busy the cap is exceeded rather than dropping a busy guard."""
+        for key, old in list(self._jobs.items()):
+            if len(self._jobs) <= MAX_JOBS:
+                break
+            if old.done.is_set():
+                del self._jobs[key]

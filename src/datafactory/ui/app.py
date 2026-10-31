@@ -1,15 +1,17 @@
 """FastAPI app: server-rendered pages over ``pipeline.run`` and the data zones."""
 
+from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Any
 
 from fastapi import APIRouter, FastAPI, Form, HTTPException, Request
-from fastapi.responses import HTMLResponse, RedirectResponse, Response
+from fastapi.responses import HTMLResponse, RedirectResponse, Response, StreamingResponse
 from fastapi.templating import Jinja2Templates
 
 from datafactory.contracts.dataset import DatasetSpec, TableSchema
 from datafactory.core.config import Settings, get_settings
 from datafactory.core.errors import ConfigError
+from datafactory.core.logging import configure_logging
 from datafactory.pipeline.runner import RunResult, Stage, run
 from datafactory.ui import catalog
 from datafactory.ui.jobs import DatasetBusyError, JobManager, JobStatus
@@ -20,9 +22,14 @@ router = APIRouter()
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     resolved = settings or get_settings()
+    configure_logging()  # without it the run pages show no INFO logs when serving directly
 
-    def run_fn(slug: str, stage: Stage | None, batch_id: str | None, release: bool) -> RunResult:
-        return run(slug, stage=stage, batch_id=batch_id, release=release, settings=resolved)
+    def run_fn(
+        slug: str, stage: Stage | None, batch_id: str | None, release: bool, now: datetime
+    ) -> RunResult:
+        return run(
+            slug, stage=stage, batch_id=batch_id, release=release, settings=resolved, now=now
+        )
 
     app = FastAPI(title="data-factory", docs_url=None, redoc_url=None, openapi_url=None)
     app.state.settings = resolved
@@ -101,10 +108,13 @@ def start_run(
         raise HTTPException(422, str(exc)) from exc
     try:
         chosen = Stage(stage) if stage else None
+        batch_id = catalog.safe_name(batch) if batch else None
     except ValueError as exc:
         raise HTTPException(400, f"unknown stage {stage!r}") from exc
+    except catalog.NotFoundError as exc:
+        raise HTTPException(400, f"invalid batch id {batch!r}") from exc
     try:
-        job = _jobs(request).start(slug, chosen, batch or None, release)
+        job = _jobs(request).start(slug, chosen, batch_id, release)
     except DatasetBusyError as exc:
         return RedirectResponse(f"/jobs/{exc.job_id}", status_code=303)
     return RedirectResponse(f"/jobs/{job.id}", status_code=303)
@@ -150,7 +160,12 @@ def product(request: Request, slug: str, version: str) -> HTMLResponse:
     except catalog.NotFoundError as exc:
         raise HTTPException(404, f"product {slug} {version} not found") from exc
     files = sorted(p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file())
-    data = package.resources[0].path if package.resources else "data.csv"
+    data = "data.csv"
+    if package.resources:
+        try:
+            data = catalog.safe_relpath(package.resources[0].path).as_posix()
+        except catalog.NotFoundError as exc:
+            raise HTTPException(404, f"unsafe resource path {package.resources[0].path!r}") from exc
     return _page(
         request,
         "product.html",
@@ -164,8 +179,9 @@ def product(request: Request, slug: str, version: str) -> HTMLResponse:
 @router.get("/datasets/{slug}/products/{version}/download")
 def download(request: Request, slug: str, version: str) -> Response:
     try:
+        catalog.product_dir(slug, version, _settings(request))  # validated eagerly
         content = catalog.zip_product(slug, version, _settings(request))
     except catalog.NotFoundError as exc:
         raise HTTPException(404, f"product {slug} {version} not found") from exc
     headers = {"Content-Disposition": f'attachment; filename="{slug}-{version}.zip"'}
-    return Response(content, media_type="application/zip", headers=headers)
+    return StreamingResponse(content, media_type="application/zip", headers=headers)

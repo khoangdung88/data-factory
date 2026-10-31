@@ -57,6 +57,5 @@ def serve_ui(
 
     from datafactory.ui.app import create_app  # noqa: PLC0415
 
-    configure_logging()
     typer.echo(f"data-factory UI on http://{host}:{port}")
     uvicorn.run(create_app(get_settings()), host=host, port=port)
