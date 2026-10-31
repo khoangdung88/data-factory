@@ -99,11 +99,13 @@ class JobManager:
         return job
 
     def get(self, job_id: str) -> Job | None:
-        return self._jobs.get(job_id)
+        with self._lock:
+            return self._jobs.get(job_id)
 
     def list(self, slug: str | None = None) -> list[Job]:
-        jobs = [j for j in reversed(self._jobs.values()) if slug is None or j.slug == slug]
-        return jobs
+        with self._lock:  # _execute evicts finished jobs; iterate a snapshot
+            snapshot = list(reversed(self._jobs.values()))
+        return [j for j in snapshot if slug is None or j.slug == slug]
 
     def _execute(self, job: Job) -> None:
         handler = _ThreadLogHandler(job, threading.get_ident())
