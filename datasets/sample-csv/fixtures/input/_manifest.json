@@ -1,0 +1,16 @@
+{
+  "dataset": "sample-csv",
+  "batch_id": "960c881be571",
+  "connector": "local_file",
+  "connector_version": "1.0.0",
+  "source": "fixtures/input/catalogue.csv",
+  "license": "CC0-1.0 (synthetic data created for this repository)",
+  "fetched_at": "2026-01-01T00:00:00Z",
+  "files": [
+    {
+      "path": "catalogue.csv",
+      "sha256": "edd9e35b952f3d289c8c0790de7039139565fa016cb0ca76642975af4ee947ab",
+      "bytes": 370
+    }
+  ]
+}

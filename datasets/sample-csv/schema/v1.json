@@ -1,0 +1,11 @@
+{
+  "fields": [
+    {"name": "sku", "type": "string", "description": "Stock keeping unit", "constraints": {"required": true}},
+    {"name": "name", "type": "string", "description": "Product name", "constraints": {"required": true}},
+    {"name": "category", "type": "string", "description": "Product category"},
+    {"name": "price", "type": "number", "description": "Unit price", "constraints": {"required": true}},
+    {"name": "currency", "type": "string", "description": "ISO 4217 code", "constraints": {"required": true}},
+    {"name": "in_stock", "type": "boolean", "description": "Available now"},
+    {"name": "released_on", "type": "date", "description": "Release date (YYYY-MM-DD)"}
+  ]
+}

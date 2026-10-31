@@ -1,0 +1,26 @@
+slug: sample-csv
+title: Sample product catalogue
+description: Synthetic product catalogue; reference dataset showing every pipeline stage.
+version: 1.0.0
+schema_version: 1
+license:
+  name: CC0-1.0
+  path: https://creativecommons.org/publicdomain/zero/1.0/
+source:
+  plugin: local_file
+  license: CC0-1.0 (synthetic data created for this repository)
+  params:
+    path: fixtures/input/catalogue.csv  # the sample source is the golden input itself
+processing:
+  - plugin: select_columns
+    params:
+      columns: [sku, name, category, price, currency, in_stock, released_on]
+quality:
+  min_rows: 1
+  max_invalid_ratio: 0.25
+publish:
+  - plugin: local_folder
+    params:
+      target_dir: exports
+pricing:
+  model: free
