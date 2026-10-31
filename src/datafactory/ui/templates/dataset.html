@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ spec.slug }}{% endblock %}
+{% block content %}
+<h1>{{ spec.title }}</h1>
+<p class="muted"><code>{{ spec.slug }}</code> · version {{ spec.version }} · schema v{{ spec.schema_version }}
+  · connector <code>{{ spec.source.plugin }}</code> · reader <code>{{ spec.reader.plugin }}</code>
+  · license {{ spec.license.name }}</p>
+<p>{{ spec.description }}</p>
+
+<h2>Run</h2>
+<div class="card">
+<form class="run" method="post" action="/datasets/{{ spec.slug }}/run">
+  <label>Stage
+    <select name="stage">
+      <option value="">all (collect → process → publish)</option>
+      {% for s in stages %}<option value="{{ s.value }}">{{ s.value }} only</option>{% endfor %}
+    </select>
+  </label>
+  <label>Batch
+    <select name="batch">
+      <option value="">latest</option>
+      {% for b in batches %}<option value="{{ b.raw.batch_id }}">{{ b.raw.batch_id }} ({{ b.raw.fetched_at.strftime("%Y-%m-%d %H:%M") }})</option>{% endfor %}
+    </select>
+  </label>
+  <label style="flex-direction:row;align-items:center;font-weight:400">
+    <input type="checkbox" name="release" value="true"> release (run remote publishers)
+  </label>
+  <button type="submit">Run</button>
+</form>
+<p class="muted" style="margin:8px 0 0">Batch applies to <code>process</code>/<code>publish</code>; a full run always collects a fresh batch.</p>
+</div>
+
+<h2>Recent runs</h2>
+{% include "_jobs.html" %}
+
+<h2>Products</h2>
+{% if products %}
+<table>
+  <tr><th>Version</th><th>Created (UTC)</th><th>Rows</th><th>Rejected</th><th>Batch</th><th></th></tr>
+  {% for p in products %}
+  <tr>
+    <td><a href="/datasets/{{ spec.slug }}/products/{{ p.version }}">{{ p.version }}</a></td>
+    <td>{{ p.created.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+    <td>{{ p.quality.rows_valid }}</td>
+    <td>{{ p.quality.rows_invalid }}</td>
+    <td>{{ p.lineage.batch_ids | join(", ") }}</td>
+    <td><a class="btn" href="/datasets/{{ spec.slug }}/products/{{ p.version }}/download">Download zip</a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}<p class="muted">No products yet.</p>{% endif %}
+
+<h2>Batches</h2>
+{% if batches %}
+<table>
+  <tr><th>Batch</th><th>Fetched (UTC)</th><th>Files</th><th>Processed</th><th>Valid</th><th>Rejected</th></tr>
+  {% for b in batches %}
+  <tr>
+    <td><a href="/datasets/{{ spec.slug }}/batches/{{ b.raw.batch_id }}">{{ b.raw.batch_id }}</a></td>
+    <td>{{ b.raw.fetched_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+    <td>{{ b.raw.files | length }}</td>
+    {% if b.staged %}
+    <td class="ok">yes</td><td>{{ b.staged.quality.rows_valid }}</td><td>{{ b.staged.quality.rows_invalid }}</td>
+    {% else %}
+    <td class="muted">no</td><td></td><td></td>
+    {% endif %}
+  </tr>
+  {% endfor %}
+</table>
+{% else %}<p class="muted">No batches yet.</p>{% endif %}
+
+<h2>Schema v{{ spec.schema_version }}</h2>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+  {% for f in schema.fields %}
+  <tr><td><code>{{ f.name }}</code></td><td>{{ f.type }}</td><td>{{ "yes" if f.constraints.required else "" }}</td><td>{{ f.description }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

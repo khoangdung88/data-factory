@@ -51,7 +51,25 @@ Settings (environment variables or a `.env` file in the repo root):
 | `DF_DATA_DIR` | `data` | Root of the data zones |
 | `DF_DATASETS_DIR` | `datasets` | Where dataset definitions live |
 
-## 4. What you get
+## 4. Web UI
+
+```bash
+uv run datafactory ui            # open http://127.0.0.1:8000
+uv run datafactory ui --port 9000
+```
+
+| Page | What you can do |
+|---|---|
+| **Datasets** (`/`) | See every dataset with its version, latest batch and latest product; broken `dataset.yaml` files show their error |
+| **Dataset** | Run the pipeline (all stages or one, choose a batch, tick *release*); list products (download zip), batches and the schema |
+| **Run** | Status, log and result of a run; the page refreshes every 2 s until it finishes. Only one run per dataset at a time |
+| **Batch** | Raw files with checksums, quality numbers, first 50 valid and rejected rows |
+| **Product** | License, sources, lineage, quality, file list, data preview, *Download zip* |
+
+The UI has no login and listens on `127.0.0.1` only: do not expose it to the internet. Run history is
+kept in memory and cleared when the UI stops; data zones are not affected.
+
+## 5. What you get
 
 ```text
 data/
@@ -73,7 +91,7 @@ A product folder is what you upload or sell:
 Check quality before selling: `quality` in `datapackage.json` (`rows_in`, `rows_valid`, `rows_invalid`,
 `null_counts`) and the rows in `staged/<slug>/<batch_id>/quarantine.csv`.
 
-## 5. Run behaviour you can rely on
+## 6. Run behaviour you can rely on
 
 - **Re-running is safe.** Same source data → same `batch_id`, nothing duplicated. Same data and version
   → the existing product is reused.
@@ -83,7 +101,7 @@ Check quality before selling: `quality` in `datapackage.json` (`rows_in`, `rows_
   `valid rows < min_rows` or `invalid ratio ... > max`; nothing is published.
 - `data/` is git-ignored: products stay on your machine until a publisher sends them somewhere.
 
-## 6. Create your own dataset
+## 7. Create your own dataset
 
 1. Create `datasets/<slug>/` (`<slug>` = lowercase words joined by `-`).
 2. `dataset.yaml`:
@@ -141,7 +159,7 @@ null; a `required` null or a wrong type sends the row to quarantine.
 | processor | `sort_rows` | `by` |
 | publisher | `local_folder` | `target_dir` (default `exports`, relative to `DF_DATA_DIR`) |
 
-## 7. Troubleshooting
+## 8. Troubleshooting
 
 | Message | Cause → fix |
 |---|---|

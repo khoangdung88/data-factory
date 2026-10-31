@@ -1,0 +1,15 @@
+{% if jobs %}
+<table>
+  <tr><th>Run</th><th>Dataset</th><th>Stage</th><th>Status</th><th>Started (UTC)</th><th>Result</th></tr>
+  {% for j in jobs %}
+  <tr>
+    <td><a href="/jobs/{{ j.id }}">{{ j.id }}</a></td>
+    <td><a href="/datasets/{{ j.slug }}">{{ j.slug }}</a></td>
+    <td>{{ j.stage or "all" }}{% if j.release %} + release{% endif %}</td>
+    <td><span class="badge {{ j.status }}">{{ j.status }}</span></td>
+    <td>{{ j.started_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+    <td>{% if j.result %}batch <code>{{ j.result.batch_id }}</code>{% elif j.error %}<span class="bad">{{ j.error }}</span>{% endif %}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}<p class="muted">No runs yet.</p>{% endif %}

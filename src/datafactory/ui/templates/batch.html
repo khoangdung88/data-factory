@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Batch {{ entry.raw.batch_id }}{% endblock %}
+{% block content %}
+<h1>Batch {{ entry.raw.batch_id }}</h1>
+<p class="muted"><a href="/datasets/{{ slug }}">{{ slug }}</a> · connector {{ entry.raw.connector }} {{ entry.raw.connector_version }}
+  · fetched {{ entry.raw.fetched_at.strftime("%Y-%m-%d %H:%M:%S") }} UTC</p>
+<p>Source: <code>{{ entry.raw.source }}</code></p>
+
+<h2>Raw files</h2>
+<table>
+  <tr><th>File</th><th>Bytes</th><th>SHA-256</th></tr>
+  {% for f in entry.raw.files %}<tr><td>{{ f.path }}</td><td>{{ f.bytes }}</td><td><code>{{ f.sha256[:16] }}…</code></td></tr>{% endfor %}
+</table>
+
+<h2>Processing</h2>
+{% if entry.staged %}
+{% with quality = entry.staged.quality %}{% include "_quality.html" %}{% endwith %}
+<p class="muted">Processors:
+{% for p in entry.staged.processors %}<code>{{ p.name }} {{ p.version }}</code>{% if not loop.last %} → {% endif %}{% else %}none{% endfor %}</p>
+<h2>Valid rows (data.csv)</h2>
+{% with preview = data %}{% include "_preview.html" %}{% endwith %}
+<h2>Rejected rows (quarantine.csv)</h2>
+{% with preview = quarantine %}{% include "_preview.html" %}{% endwith %}
+{% else %}
+<p class="muted">Not processed yet. Run stage <code>process</code> for this batch on the dataset page.</p>
+{% endif %}
+{% endblock %}

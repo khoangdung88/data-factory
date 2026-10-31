@@ -22,7 +22,9 @@ flowchart LR
 - **Lineage**: every product records the raw batch ids, connector/processor versions and checksums it was
   built from.
 - Import direction, enforced by `import-linter` (`pyproject.toml`):
-  `cli → pipeline → collect | process | publish → contracts → core`.
+  `cli → ui → pipeline → collect | process | publish → contracts → core`.
+- **UI** (`ui/`, ADR 0003): local FastAPI app started by `datafactory ui`; runs `pipeline.run` in a
+  background thread per dataset and renders zone files read through `contracts` models.
 
 Run: `uv run datafactory run <slug> [--stage collect|process|publish] [--batch ID] [--release]`.
 

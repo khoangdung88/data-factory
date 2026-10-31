@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% if running %}<meta http-equiv="refresh" content="2">{% endif %}
+<title>{% block title %}data-factory{% endblock %} · data-factory</title>
+<style>
+  :root { --fg:#1f2328; --muted:#656d76; --line:#d0d7de; --bg:#f6f8fa; --accent:#0969da;
+          --ok:#1a7f37; --bad:#cf222e; --warn:#9a6700; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--fg); }
+  header { background:#24292f; color:#fff; padding:10px 24px; display:flex; gap:24px; align-items:center; }
+  header a { color:#fff; text-decoration:none; font-weight:600; }
+  header nav a { font-weight:400; opacity:.85; margin-right:16px; }
+  main { max-width:1200px; margin:0 auto; padding:24px; }
+  h1 { font-size:22px; margin:0 0 4px; } h2 { font-size:16px; margin:28px 0 8px; }
+  a { color:var(--accent); }
+  .muted { color:var(--muted); }
+  table { border-collapse:collapse; width:100%; background:#fff; }
+  th, td { border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top; }
+  th { background:var(--bg); font-weight:600; }
+  .scroll { overflow-x:auto; max-height:480px; overflow-y:auto; }
+  .badge { display:inline-block; padding:1px 8px; border-radius:10px; font-size:12px; font-weight:600;
+           border:1px solid currentColor; }
+  .succeeded, .ok { color:var(--ok); } .failed, .bad { color:var(--bad); } .running { color:var(--warn); }
+  .card { border:1px solid var(--line); border-radius:6px; padding:16px; background:var(--bg); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; }
+  .stat b { display:block; font-size:20px; }
+  form.run { display:flex; gap:12px; align-items:end; flex-wrap:wrap; }
+  form.run label { display:flex; flex-direction:column; gap:4px; font-weight:600; }
+  select, button { font:inherit; padding:6px 10px; border:1px solid var(--line); border-radius:6px; }
+  button { background:var(--ok); color:#fff; border-color:var(--ok); cursor:pointer; font-weight:600; }
+  .btn { display:inline-block; padding:6px 12px; border:1px solid var(--line); border-radius:6px;
+         background:#fff; text-decoration:none; }
+  pre { background:#0d1117; color:#e6edf3; padding:12px; border-radius:6px; overflow:auto;
+        max-height:420px; font-size:12px; }
+  .error { border:1px solid var(--bad); color:var(--bad); background:#ffebe9; padding:10px 14px;
+           border-radius:6px; }
+  code { background:var(--bg); padding:1px 4px; border-radius:4px; }
+</style>
+</head>
+<body>
+<header>
+  <a href="/">data-factory</a>
+  <nav><a href="/">Datasets</a><a href="/jobs">Runs</a></nav>
+</header>
+<main>{% block content %}{% endblock %}</main>
+</body>
+</html>
