@@ -24,5 +24,13 @@ flowchart LR
 - Import direction, enforced by `import-linter` (`pyproject.toml`):
   `cli → pipeline → collect | process | publish → contracts → core`.
 
-Status: skeleton only — interfaces and pipeline are specified in
-`docs/features/project-skeleton.md`.
+Run: `uv run datafactory run <slug> [--stage collect|process|publish] [--batch ID] [--release]`.
+
+- `collect/stage.py`: connector → raw batch; `batch_id` = hash(connector, params, file checksums), so
+  re-collecting unchanged data reuses the batch.
+- `process/stage.py`: processor steps → `process/validate.py` (schema check; bad rows → `quarantine.csv`)
+  → `staged/<slug>/<batch_id>/` with quality report.
+- `publish/package.py`: quality gates → immutable `products/<slug>/<version>/` (`data.csv`, `README.md`,
+  `LICENSE`, `datapackage.json`); then publishers run (`remote` ones only with `--release`).
+- Golden test (`tests/test_golden_datasets.py`) replays `datasets/<slug>/fixtures/input` (a recorded raw
+  batch) through process + publish and compares with `fixtures/expected` byte for byte.

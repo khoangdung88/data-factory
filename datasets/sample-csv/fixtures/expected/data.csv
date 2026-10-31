@@ -1,0 +1,5 @@
+sku,name,category,price,currency,in_stock,released_on
+A-001,Steel bolt M8,hardware,0.25,USD,true,2025-01-15
+A-002,Steel nut M8,hardware,0.10,USD,true,2025-01-15
+B-001,Cable tie 200mm,electrical,0.05,USD,false,2025-03-02
+C-001,Work gloves,safety,3.50,USD,true,

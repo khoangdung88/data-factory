@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 issue: ""
 ---
 # Project skeleton: contracts, plugin interfaces, pipeline, sample dataset
@@ -21,9 +21,9 @@ copy from.
 Real sources, marketplaces, scheduling, cloud storage, processing library choice.
 
 ## Acceptance criteria
-- [ ] `datafactory run sample-csv` produces `data/products/sample-csv/1.0.0/datapackage.json`
-- [ ] Each stage can run alone from the previous zone
-- [ ] Golden test passes for every dataset folder; `make check` green
+- [x] `datafactory run sample-csv` produces `data/products/sample-csv/1.0.0/datapackage.json`
+- [x] Each stage can run alone from the previous zone
+- [x] Golden test passes for every dataset folder; `make check` green
 
 ## Impact on existing features
 None (first feature).

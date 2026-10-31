@@ -1,0 +1,119 @@
+{
+  "name": "sample-csv",
+  "title": "Sample product catalogue",
+  "description": "Synthetic product catalogue; reference dataset showing every pipeline stage.",
+  "version": "1.0.0",
+  "created": "2026-01-01T00:00:00Z",
+  "licenses": [
+    {
+      "name": "CC0-1.0",
+      "path": "https://creativecommons.org/publicdomain/zero/1.0/"
+    }
+  ],
+  "sources": [
+    {
+      "title": "local_file: fixtures/input/catalogue.csv",
+      "path": "fixtures/input/catalogue.csv"
+    }
+  ],
+  "resources": [
+    {
+      "name": "sample-csv",
+      "path": "data.csv",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 260,
+      "hash": "sha256:b3c6c73b0ded2c1813f83eb96056caba9cdc1202e011ae394661f32d5387d710",
+      "schema": {
+        "fields": [
+          {
+            "name": "sku",
+            "type": "string",
+            "description": "Stock keeping unit",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "name",
+            "type": "string",
+            "description": "Product name",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "category",
+            "type": "string",
+            "description": "Product category",
+            "constraints": {
+              "required": false
+            }
+          },
+          {
+            "name": "price",
+            "type": "number",
+            "description": "Unit price",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "currency",
+            "type": "string",
+            "description": "ISO 4217 code",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "in_stock",
+            "type": "boolean",
+            "description": "Available now",
+            "constraints": {
+              "required": false
+            }
+          },
+          {
+            "name": "released_on",
+            "type": "date",
+            "description": "Release date (YYYY-MM-DD)",
+            "constraints": {
+              "required": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "lineage": {
+    "batch_ids": [
+      "960c881be571"
+    ],
+    "connector": {
+      "name": "local_file",
+      "version": "1.0.0"
+    },
+    "processors": [
+      {
+        "name": "select_columns",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "quality": {
+    "rows_in": 5,
+    "rows_valid": 4,
+    "rows_invalid": 1,
+    "null_counts": {
+      "sku": 0,
+      "name": 0,
+      "category": 0,
+      "price": 0,
+      "currency": 0,
+      "in_stock": 0,
+      "released_on": 1
+    }
+  }
+}
