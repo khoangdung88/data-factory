@@ -12,7 +12,7 @@
 <h2>License, sources and lineage</h2>
 <table>
   <tr><th>License</th><td>{% for l in package.licenses %}<a href="{{ l.path }}">{{ l.name }}</a> {% endfor %}</td></tr>
-  <tr><th>Sources</th><td>{% for s in package.sources %}{{ s.title }}: <code>{{ s.path }}</code><br>{% endfor %}</td></tr>
+  <tr><th>Sources</th><td>{% for s in package.sources %}{% if s.title != s.path %}{{ s.title }}: {% endif %}<code>{{ s.path }}</code><br>{% endfor %}</td></tr>
   <tr><th>Batches</th><td>{% for b in package.lineage.batch_ids %}<a href="/datasets/{{ slug }}/batches/{{ b }}">{{ b }}</a> {% endfor %}</td></tr>
   <tr><th>Connector</th><td><code>{{ package.lineage.connector.name }} {{ package.lineage.connector.version }}</code></td></tr>
   <tr><th>Processors</th><td>{% for p in package.lineage.processors %}<code>{{ p.name }} {{ p.version }}</code> {% else %}none{% endfor %}</td></tr>
