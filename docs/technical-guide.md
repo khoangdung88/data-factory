@@ -49,7 +49,7 @@ CSV I/O is UTF-8 with `\n` line endings, so identical input gives byte-identical
 | Thing | Rule |
 |---|---|
 | `dataset.yaml` `version` | Semver; one immutable product per version |
-| `schema/vN.json` | Never edited after merge (CI); breaking change → `vN+1.json` + bump `schema_version` and `version` |
+| `schema/vN.json` | Immutable once merged; see golden rule 3 in [`AGENTS.md`](../AGENTS.md) |
 | Plugin `version` class attribute | Bump when output changes; recorded in lineage |
 | Contracts (`contracts/`) | Additive optional fields only; anything else → ADR |
 
