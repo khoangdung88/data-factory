@@ -20,6 +20,7 @@ from datafactory.core.errors import CollectError
 BASE_URL = "https://api.worldbank.org/v2"
 ECONOMIES = "economies"
 AGGREGATE_REGION = "NA"
+REQUEST_INTERVAL_S = 1.0
 
 
 class WorldBankParams(BaseModel):
@@ -67,9 +68,18 @@ class WorldBankConnector(Connector):
 
     def fetch(self, params: Mapping[str, Any], ctx: FetchContext) -> str:
         p = WorldBankParams.model_validate(params)
+        requests = 0
+
+        def get(url: str) -> tuple[bytes, list[Any]]:
+            nonlocal requests
+            if requests:
+                time.sleep(REQUEST_INTERVAL_S)
+            requests += 1
+            return _get_json(url)
+
         countries = p.countries
         if countries == ECONOMIES:
-            body, data = _get_json(f"{BASE_URL}/country?format=json&per_page=1000")
+            body, data = get(f"{BASE_URL}/country?format=json&per_page=1000")
             (ctx.dest / "countries.json").write_bytes(body)
             rows = data[1] if len(data) > 1 and data[1] else []
             countries = ";".join(
@@ -82,8 +92,9 @@ class WorldBankConnector(Connector):
                     {"format": "json", "date": p.date, "per_page": p.per_page, "page": page}
                 )
                 url = f"{BASE_URL}/country/{countries}/indicator/{indicator}?{query}"
-                body, data = _get_json(url)
+                body, data = get(url)
                 (ctx.dest / f"indicator-{indicator}-p{page:03d}.json").write_bytes(body)
                 pages = int(data[0].get("pages") or 1)
                 page += 1
-        return f"{BASE_URL}/country/{p.countries}/indicator/{';'.join(p.indicators)}?date={p.date}"
+        indicators = ";".join(p.indicators)
+        return f"{BASE_URL}/country/{countries}/indicator/{indicators}?format=json&date={p.date}"
