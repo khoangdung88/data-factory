@@ -1,7 +1,7 @@
 # User guide
 
 How to install data-factory, build a data product, read the output and fix common errors.
-For internals see [`technical-guide.md`](technical-guide.md).
+For internals see [`technical-guide.md`](technical-guide.md). Tiếng Việt: [`user-guide.vi.md`](user-guide.vi.md).
 
 ## 1. Install
 
