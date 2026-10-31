@@ -1,0 +1,10 @@
+{
+  "fields": [
+    {"name": "country_code", "type": "string", "description": "ISO 3166-1 alpha-3 code (World Bank)", "constraints": {"required": true}},
+    {"name": "country_name", "type": "string", "description": "World Bank economy name", "constraints": {"required": true}},
+    {"name": "indicator_code", "type": "string", "description": "WDI indicator code", "constraints": {"required": true}},
+    {"name": "indicator_name", "type": "string", "description": "WDI indicator name incl. unit", "constraints": {"required": true}},
+    {"name": "year", "type": "integer", "description": "Observation year", "constraints": {"required": true}},
+    {"name": "value", "type": "number", "description": "Observed value, unit per indicator_name", "constraints": {"required": true}}
+  ]
+}

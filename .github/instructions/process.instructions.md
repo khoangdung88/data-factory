@@ -12,3 +12,5 @@ applyTo: "src/datafactory/process/**"
   never silently dropped.
 - PII: detect and drop/hash/aggregate as configured; default is drop.
 - Record row counts in/out and quality metrics (null %, duplicates) for the datasheet.
+- Raw files → table via a reader in `process/readers/` (set by `reader:` in `dataset.yaml`, default
+  `csv`). New raw format = new reader file + one registry line.

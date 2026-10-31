@@ -1,0 +1,122 @@
+{
+  "name": "wb-macro-indicators",
+  "title": "World macro indicators by country and year (2000-2025)",
+  "description": "Cleaned long-format panel of core World Bank World Development Indicators (GDP, GDP per capita, GDP growth, population, inflation) for all economies, regional aggregates excluded.",
+  "version": "1.0.0",
+  "created": "2026-01-01T00:00:00Z",
+  "licenses": [
+    {
+      "name": "CC-BY-4.0",
+      "path": "https://creativecommons.org/licenses/by/4.0/"
+    }
+  ],
+  "sources": [
+    {
+      "title": "worldbank: https://api.worldbank.org/v2/country/economies/indicator/NY.GDP.MKTP.CD;NY.GDP.PCAP.CD;NY.GDP.MKTP.KD.ZG;SP.POP.TOTL;FP.CPI.TOTL.ZG?date=2000:2025",
+      "path": "https://api.worldbank.org/v2/country/economies/indicator/NY.GDP.MKTP.CD;NY.GDP.PCAP.CD;NY.GDP.MKTP.KD.ZG;SP.POP.TOTL;FP.CPI.TOTL.ZG?date=2000:2025"
+    }
+  ],
+  "resources": [
+    {
+      "name": "wb-macro-indicators",
+      "path": "data.csv",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8",
+      "bytes": 1284,
+      "hash": "sha256:f7a1aa3ed8474e3455437a17b147c4ff5573e90437e4379bb6643c9ec20b3c82",
+      "schema": {
+        "fields": [
+          {
+            "name": "country_code",
+            "type": "string",
+            "description": "ISO 3166-1 alpha-3 code (World Bank)",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "country_name",
+            "type": "string",
+            "description": "World Bank economy name",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "indicator_code",
+            "type": "string",
+            "description": "WDI indicator code",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "indicator_name",
+            "type": "string",
+            "description": "WDI indicator name incl. unit",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "year",
+            "type": "integer",
+            "description": "Observation year",
+            "constraints": {
+              "required": true
+            }
+          },
+          {
+            "name": "value",
+            "type": "number",
+            "description": "Observed value, unit per indicator_name",
+            "constraints": {
+              "required": true
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "lineage": {
+    "batch_ids": [
+      "bc38a5882e2a"
+    ],
+    "connector": {
+      "name": "worldbank",
+      "version": "1.0.0"
+    },
+    "processors": [
+      {
+        "name": "drop_rows_missing",
+        "version": "1.0.0"
+      },
+      {
+        "name": "select_columns",
+        "version": "1.0.0"
+      },
+      {
+        "name": "rename_columns",
+        "version": "1.0.0"
+      },
+      {
+        "name": "sort_rows",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "quality": {
+    "rows_in": 18,
+    "rows_valid": 18,
+    "rows_invalid": 0,
+    "null_counts": {
+      "country_code": 0,
+      "country_name": 0,
+      "indicator_code": 0,
+      "indicator_name": 0,
+      "year": 0,
+      "value": 0
+    }
+  }
+}

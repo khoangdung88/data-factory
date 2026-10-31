@@ -1,0 +1,56 @@
+slug: wb-macro-indicators
+title: World macro indicators by country and year (2000-2025)
+description: >-
+  Cleaned long-format panel of core World Bank World Development Indicators (GDP, GDP per capita,
+  GDP growth, population, inflation) for all economies, regional aggregates excluded.
+version: 1.0.0
+schema_version: 1
+license:
+  name: CC-BY-4.0
+  path: https://creativecommons.org/licenses/by/4.0/
+source:
+  plugin: worldbank
+  license: >-
+    CC BY 4.0, World Bank Open Data terms (https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets);
+    attribution "The World Bank: World Development Indicators" required.
+  params:
+    indicators:
+      - NY.GDP.MKTP.CD
+      - NY.GDP.PCAP.CD
+      - NY.GDP.MKTP.KD.ZG
+      - SP.POP.TOTL
+      - FP.CPI.TOTL.ZG
+    countries: economies
+    date: "2000:2025"
+reader:
+  plugin: json_records
+  params:
+    pattern: "indicator-*.json"
+    records_path: [1]
+processing:
+  - plugin: drop_rows_missing
+    params:
+      columns: [value]
+  - plugin: select_columns
+    params:
+      columns: [countryiso3code, country.value, indicator.id, indicator.value, date, value]
+  - plugin: rename_columns
+    params:
+      mapping:
+        countryiso3code: country_code
+        country.value: country_name
+        indicator.id: indicator_code
+        indicator.value: indicator_name
+        date: year
+  - plugin: sort_rows
+    params:
+      by: [country_code, indicator_code, year]
+quality:
+  min_rows: 1
+  max_invalid_ratio: 0.01
+publish:
+  - plugin: local_folder
+    params:
+      target_dir: exports
+pricing:
+  model: undecided
