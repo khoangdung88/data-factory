@@ -142,7 +142,7 @@ def test_starts_do_not_hang_when_all_slots_busy() -> None:
     release_all.set()
     for job in jobs:
         assert job.done.wait(10)
-    assert len(manager.list()) <= 110
+    assert len(manager.list()) <= 100  # finished jobs trimmed when each completes
 
 
 def test_list_is_newest_first() -> None:
