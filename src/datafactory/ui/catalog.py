@@ -1,9 +1,10 @@
 """Read-only views of datasets and data zones for the UI."""
 
 import csv
-import io
 import re
+import tempfile
 import zipfile
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -52,10 +53,15 @@ def check_slug(slug: str) -> str:
     return slug
 
 
-def _child(parent: Path, name: str) -> Path:
+def safe_name(name: str) -> str:
+    """A single path segment that cannot traverse outside the data zones."""
     if not _NAME.fullmatch(name) or ".." in name:
         raise NotFoundError(name)
-    return parent / name
+    return name
+
+
+def _child(parent: Path, name: str) -> Path:
+    return parent / safe_name(name)
 
 
 def list_datasets(settings: Settings) -> list[DatasetEntry]:
@@ -154,10 +160,15 @@ def preview_csv(path: Path, limit: int = 50) -> Preview | None:
     return Preview(columns=columns, rows=rows, truncated=False)
 
 
-def zip_product(slug: str, version: str, settings: Settings) -> bytes:
+def zip_product(slug: str, version: str, settings: Settings) -> Iterator[bytes]:
+    """Stream the product zip in chunks; the whole product is never loaded at once."""
     root = product_dir(slug, version, settings)
-    buffer = io.BytesIO()
-    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
-        for path in sorted(p for p in root.rglob("*") if p.is_file()):
-            zf.write(path, f"{slug}-{version}/{path.relative_to(root).as_posix()}")
-    return buffer.getvalue()
+    prefix = f"{slug}-{version}/"
+    files = sorted(p for p in root.rglob("*") if p.is_file())
+    with tempfile.TemporaryFile(prefix="dfui-") as tmp:
+        with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as zf:
+            for path in files:
+                zf.write(path, prefix + path.relative_to(root).as_posix())
+        tmp.seek(0)
+        while chunk := tmp.read(1 << 16):
+            yield chunk
